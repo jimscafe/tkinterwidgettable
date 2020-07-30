@@ -13,16 +13,41 @@ class MainGUI(object):
         columns = self.createColumns_1()
         noRows = 6
         data = self.createMatrix_1(10, len(columns))
-        option = 1  # Modify this to demonstrate 5 options
+        option = 3  # Modify this to demonstrate 5 options
         # ----------------------------------------------------------------------
-        # Option to draw table before data created?
+        # Option to show mousewheel
         if option == 1:
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
             self.table.setData(data)
         # ----------------------------------------------------------------------
+        # Option to get cell data when clicked
+        # ----------------------------------------------------------------------
+        if option == 2:
+            self.table = MyTable(self.tableFrame, columns, rows=len(data))
+            self.table.setData(data)
+            self.table.clicked = self.cellClicked
+        # ----------------------------------------------------------------------
+        # Option to sort column
+        if option == 3:
+            self.table = MyTable(self.tableFrame, columns, rows=len(data))
+            # Change data to show a sort result for Column 3
+            data[1][2] = '9999'
+            self.table.setData(data)
+            self.table.clicked = self.columnSort
+
         # Get table dimensions if needed
         print (f'Table size w:{self.table.width} h:{self.table.height}')
 
+    def cellClicked(self, widget):
+        print (f'Row: {widget.trow} Column: {widget.tcol} Data: {widget.getText()}')
+
+    def columnSort(self, widget):
+        #print (widget.tcol, widget.trow)
+        if widget.trow == -1: # Header clicked
+            if widget.tcol == 2: # 3rd column clicked
+                # Use data in table object, or data in this object
+                data = sorted(self.table.data, key=lambda x: x[2], reverse=True) 
+                self.table.setData(data)
 
     def createMatrix_1(self, noRows=10, noColumns=8):
         data = []

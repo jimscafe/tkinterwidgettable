@@ -136,8 +136,8 @@ class MyTable:
     # ------------------------------------------------------------------------------------
     # Click on cell
     def _click(self, event):
-        print ('Clicked')
-        print (event.widget)
+        #print ('Clicked')
+        #print (event.widget)
         self.clicked(event.widget)
 
     def clicked(self, event): # Overwrite this in parent module/class
