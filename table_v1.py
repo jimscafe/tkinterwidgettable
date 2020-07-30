@@ -41,13 +41,11 @@ class MyTable:
         pad = (1,1)
         for j in range(self.noColumns):
             label_frame = TK.Frame(self.parent,width=self.columns[j]['width'],
-                                   height=DEFAULTCELLHEIGHT) #,
-                                   #bg="blue", padx=1, pady=1)
+                                   height=DEFAULTCELLHEIGHT) 
             label_frame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
             cell = widgets.Label(label_frame)
             cell.configure(bg=self.columns[j]['bg'], fg=self.columns[j]['fg'])
             cell.pack(expand=TK.YES, fill=TK.BOTH)
-            #cell.configure(relief=DEFAULTSTYLE, width=DEFAULYCELLWIDTH)
             cell.setText(self.columns[j]['text'])
             cell.trow = -1
             cell.tcol = j
@@ -56,31 +54,26 @@ class MyTable:
             if j == self.noColumns -1: pad=(1,2)
             label_frame.grid(row=0, column=j, padx=pad, pady=(2,1))
 
-
+        # Second draw cell widgets
         for i in range(self.visibleRows):
             cell_row = []
             for j in range(self.noColumns):
                 # Try with labels first - use frame round widget to set width, height in pixels
                 label_frame = TK.Frame(self.parent,width=self.columns[j]['width'],
                                        height=DEFAULTCELLHEIGHT) #,
-                                       #bg="blue", padx=1, pady=1)
                 label_frame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
                 cell = widgets.Label(label_frame)
                 cell.pack(expand=TK.YES, fill=TK.BOTH)
-                #cell.configure(relief=DEFAULTSTYLE, width=DEFAULYCELLWIDTH)
                 cell.setText('')
                 cell.trow = i
                 cell.tcol = j
                 cell_row.append(cell)
-                #cell.grid(row=i,column=j)
                 pad = (1,1)
                 ypad = (1,1)
                 if j == 0: pad = (2,1)
                 if j == self.noColumns -1: pad=(1,2)
                 if i == self.visibleRows -1: ypad = (1,2)
                 label_frame.grid(row=i+1, column=j, padx=pad, pady=ypad)
-            #     var.bind("<Button-1>", self.click) 
-            #     var.bind("<Double-Button-1>", self.dblclick) 
             self.cells.append(cell_row)
         if self.data:    
             if len(self.data) > self.visibleRows:
@@ -95,10 +88,15 @@ class MyTable:
             self.vertical_scroll = TK.Scale(self.parent, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
             self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
 
+        # Get parent frame width and height - x and y coordinates can also be accessed
+        self.parent.update() # Required to get frame width and height at this time
+        self.width = self.parent.winfo_width()
+        self.height = self.parent.winfo_height()
+
     def populateCells(self):
-        for i in range(self.visibleRows):  #, row in enumerate(self.data):
+        for i in range(min(self.visibleRows, len(self.data))): 
             rowIndex = i + self.topRow
-            for j in range(self.noColumns):  #, cell in enumerate(row):
+            for j in range(self.noColumns): 
                 cell = self.data[rowIndex][j] # Later we make this a more complex object
                 self.cells[i][j].setText(cell)
 
@@ -118,7 +116,7 @@ class MyTable:
         self.populateCells()
 
 
-    def t(self): # The basic table, no frills
+    def tempTable(self): # The basic table, no frills - demonstration only
         for i in range(self.visibleRows):
             for j in range(self.noColumns):
                 cell = widgets.Label(self.parent)

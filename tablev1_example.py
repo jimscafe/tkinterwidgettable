@@ -11,7 +11,7 @@ class MainGUI(object):
         columns = self.createColumns_1()
         noRows = 10
         data = self.createMatrix_1(10, len(columns))
-        option = 4
+        option = 1  # Modify this to demonstrate 5 options
         # ----------------------------------------------------------------------
         # Option to draw table before data created?
         if option == 1:
@@ -34,9 +34,14 @@ class MainGUI(object):
         if option == 4:
             self.table = MyTable(self.tableFrame, columns, rows=6, scroll=True) # Data has 10 rows
             self.table.setData(data)
-            # self.table.data = data
-            # self.table.setScroll()
-            # self.table.populateCells()
+        # ----------------------------------------------------------------------
+        # Option to show data has fewer rows than the table
+        if option == 5:
+            self.table = MyTable(self.tableFrame, columns, rows=12) # Data has 10 rows
+            self.table.setData(data)
+        # ----------------------------------------------------------------------
+        # Get table dimensions if needed
+        print (f'Table size w:{self.table.width} h:{self.table.height}')
 
 
     def createMatrix_1(self, noRows=10, noColumns=8):
