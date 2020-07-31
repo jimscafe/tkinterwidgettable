@@ -34,7 +34,7 @@ class MyTable:
         #self.t()
         self.drawWidgets()
         if self.data:
-            self.populateCells()
+            self.setData(data)
 
     def drawWidgets(self):
         # First column header

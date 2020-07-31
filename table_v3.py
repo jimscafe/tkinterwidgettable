@@ -1,13 +1,3 @@
-"""
-   A remake of the table widget that used entry widgets
-   Simplify some items and allow greater flexibility
-   Including other widgets as table cells (checkbox, combo box)
-   Allow scroling without scrollbar using mousewheel as an option
-
-   Need number of visible rows, and widths of columns
-   30 July 2020 - adding mousewheel scrolling
-                - add cell click event (double click can be added in the same way)
-"""
 import tkinter as TK
 import widgets
 
@@ -103,7 +93,10 @@ class MyTable:
             rowIndex = i + self.topRow
             for j in range(self.noColumns): 
                 cell = self.data[rowIndex][j] # Later we make this a more complex object
-                self.cells[i][j].setText(cell)
+                self.drawCell(self.cells[i][j], cell)
+
+    def drawCell(self, widget, cellObject):
+        widget.setText(cellObject) # cellObject in this simple case is a string
 
     def setData(self, data):
         # Check and set scrolling
@@ -141,5 +134,11 @@ class MyTable:
         self.clicked(event.widget)
 
     def clicked(self, event): # Overwrite this in parent module/class
-        print ('Cell clicked (-1 == column header')
+        print ('Cell clicked (if row is -1, the column header was clicked')
         print (f'row={event.trow} : column={event.tcol}')
+        print ('This function should be overwritten by the client function for handling click event')
+
+def Cell(data='', **kwargs):
+    # Default values for background and foregraound colors - can be overwritten by kwargs
+    return {'data': data, 'bg':'white', 'fg':'black',  **kwargs}
+

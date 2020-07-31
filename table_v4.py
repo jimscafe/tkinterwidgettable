@@ -1,13 +1,3 @@
-"""
-   A remake of the table widget that used entry widgets
-   Simplify some items and allow greater flexibility
-   Including other widgets as table cells (checkbox, combo box)
-   Allow scroling without scrollbar using mousewheel as an option
-
-   Need number of visible rows, and widths of columns
-   30 July 2020 - adding mousewheel scrolling
-                - add cell click event (double click can be added in the same way)
-"""
 import tkinter as TK
 import widgets
 
@@ -43,10 +33,10 @@ class MyTable:
         # First column header
         pad = (1,1)
         for j in range(self.noColumns):
-            label_frame = TK.Frame(self.parent,width=self.columns[j]['width'],
+            widgetFrame = TK.Frame(self.parent,width=self.columns[j]['width'],
                                    height=DEFAULTCELLHEIGHT) 
-            label_frame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
-            cell = widgets.Label(label_frame)
+            widgetFrame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
+            cell = widgets.Label(widgetFrame)
             cell.configure(bg=self.columns[j]['bg'], fg=self.columns[j]['fg'])
             cell.pack(expand=TK.YES, fill=TK.BOTH)
             cell.setText(self.columns[j]['text'])
@@ -56,17 +46,27 @@ class MyTable:
             pad = (1,1)
             if j == 0: pad = (2,1)
             if j == self.noColumns -1: pad=(1,2)
-            label_frame.grid(row=0, column=j, padx=pad, pady=(2,1))
+            widgetFrame.grid(row=0, column=j, padx=pad, pady=(2,1))
 
         # Second draw cell widgets
         for i in range(self.visibleRows):
             cell_row = []
             for j in range(self.noColumns):
                 # Try with labels first - use frame round widget to set width, height in pixels
-                label_frame = TK.Frame(self.parent,width=self.columns[j]['width'],
+                widgetName = self.columns[j].get('widget', 'Label') # Default to label
+                widgetFrame = TK.Frame(self.parent,width=self.columns[j]['width'],
                                        height=DEFAULTCELLHEIGHT) #,
-                label_frame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
-                cell = widgets.Label(label_frame)
+                widgetFrame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
+                if widgetName == 'TextBox':
+                    cell = widgets.Textbox(widgetFrame)
+                elif widgetName == 'Button':
+                    cell = widgets.Button(widgetFrame)
+                elif widgetName == 'Checkbox':
+                    cell = widgets.Checkbox(widgetFrame)
+                elif widgetName == 'Combobox':
+                    cell = widgets.Combobox(widgetFrame)
+                else:
+                    cell = widgets.Label(widgetFrame)
                 cell.pack(expand=TK.YES, fill=TK.BOTH)
                 cell.setText('')
                 cell.trow = i
@@ -78,7 +78,7 @@ class MyTable:
                 if j == 0: pad = (2,1)
                 if j == self.noColumns -1: pad=(1,2)
                 if i == self.visibleRows -1: ypad = (1,2)
-                label_frame.grid(row=i+1, column=j, padx=pad, pady=ypad)
+                widgetFrame.grid(row=i+1, column=j, padx=pad, pady=ypad)
             self.cells.append(cell_row)
         if self.data:    
             if len(self.data) > self.visibleRows:
@@ -103,7 +103,10 @@ class MyTable:
             rowIndex = i + self.topRow
             for j in range(self.noColumns): 
                 cell = self.data[rowIndex][j] # Later we make this a more complex object
-                self.cells[i][j].setText(cell)
+                self.drawCell(self.cells[i][j], cell)
+
+    def drawCell(self, widget, cellObject):
+        widget.setText(cellObject) # cellObject in this simple case is a string
 
     def setData(self, data):
         # Check and set scrolling
@@ -140,6 +143,13 @@ class MyTable:
         #print (event.widget)
         self.clicked(event.widget)
 
-    def clicked(self, event): # Overwrite this in parent module/class
-        print ('Cell clicked (-1 == column header')
-        print (f'row={event.trow} : column={event.tcol}')
+    def clicked(self, widget): # Overwrite this in parent module/class
+        print ('Cell clicked (if row is -1, the column header was clicked')
+        print (f'row={widget.trow} : column={widget.tcol}')
+        print (widget.getText())
+        print ('This function should be overwritten by the client function for handling click event')
+
+def Cell(data='', **kwargs):
+    # Default values for background and foregraound colors - can be overwritten by kwargs
+    return {'data': data, 'bg':'white', 'fg':'black',  **kwargs}
+

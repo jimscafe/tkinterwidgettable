@@ -28,6 +28,8 @@ class Button(TK.Button, DefaultWidget):
         TK.Button.__init__(self, parent)
     def click(self, fnc):
         self.config(command=fnc)
+    def getText(self):
+        return 'Button Text'
 
 class Textbox(TK.Entry, DefaultWidget):
     def __init__(self, parent, **kwargs):
@@ -36,13 +38,20 @@ class Textbox(TK.Entry, DefaultWidget):
         self.delete(0, TK.END)
         self.insert(0, txt)
 
-class Combobox(ttk.Combobox, DefaultWidget):
+class Combobox(ttk.Combobox):  # , DefaultWidget):
     def __init__(self, parent, **kwargs):
         ttk.Combobox.__init__(self, parent)
+        self.textSelection = TK.StringVar()
+        self.config(textvariable = self.textSelection)
     def setOptions(self, options):
-        self['values'] = options
+        #self['values'] = options
+        self.configure(values=options)
     def setSelection(self, index):
         self.current(index)
+    def setText(self, txt):
+        self.textSelection.set(txt)
+    def getText(self):
+        return self.textSelection.get()
 
 class Listbox(TK.Listbox):
     def __init__(self, parent, **kwargs):
@@ -51,6 +60,21 @@ class Listbox(TK.Listbox):
         self.insert(TK.END, txt)
     def getRows(self): # Overwrites existing get
         return self.get(0, TK.END)
+
+class Checkbox(TK.Checkbutton):
+    def __init__(self, parent, **kwargs):
+        TK.Checkbutton.__init__(self, parent)
+        self.var = TK.IntVar()
+        self.config(variable=self.var)
+    def setText(self, txt):
+        if txt:
+            self.select()
+        else:
+            self.deselect()
+        #print ('Set text')
+    def getText(self):
+        #print ('Get Text')
+        return self.var.get()    
 
 # class Table(UserTable):
 #     def __init__(self, parent, **kwargs):
