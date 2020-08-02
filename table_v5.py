@@ -1,3 +1,11 @@
+"""
+   Allow editing of data and provide feedback of any changes to the parent widget (Frame)
+   <Enter> key and 'lost focus; used to determine when data is entered in the Enter Widget
+   <ESC> key used to cancel data changes
+   The changes are then reflected in the table.data matrix and also a signal sent to the client
+   class  
+"""
+
 import tkinter as TK
 import widgets
 
@@ -16,7 +24,6 @@ class MyTable:
         self.scroll = scroll
         if rows == None:
             self.visibleRows = len(data)
-        #self.visibleRows = noRows
         self.noColumns = len(columns)
         self.topRow = 0
         self.data = data
@@ -24,13 +31,12 @@ class MyTable:
         self.width = 0 # Pixels
         self.height = 0
         self.cells = []  # Two dimension array
-        #self.t()
         self.drawWidgets()
         if self.data:
             self.setData(data)
 
     def drawWidgets(self):
-        # First column header
+        # First create column headers
         pad = (1,1)
         for j in range(self.noColumns):
             widgetFrame = TK.Frame(self.parent,width=self.columns[j]['width'],
@@ -48,17 +54,18 @@ class MyTable:
             if j == self.noColumns -1: pad=(1,2)
             widgetFrame.grid(row=0, column=j, padx=pad, pady=(2,1))
 
-        # Second draw cell widgets
+        # Second create cell widgets
         for i in range(self.visibleRows):
             cell_row = []
             for j in range(self.noColumns):
-                # Try with labels first - use frame round widget to set width, height in pixels
                 widgetName = self.columns[j].get('widget', 'Label') # Default to label
                 widgetFrame = TK.Frame(self.parent,width=self.columns[j]['width'],
                                        height=DEFAULTCELLHEIGHT) #,
                 widgetFrame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
-                if widgetName == 'TextBox':
+                if widgetName == 'Textbox':
                     cell = widgets.Textbox(widgetFrame)
+                    cell.bind('<Return>', self._click)
+                    cell.bind('<Escape>', self._cancelChange)
                 elif widgetName == 'Button':
                     cell = widgets.Button(widgetFrame)
                 elif widgetName == 'Checkbox':
@@ -103,7 +110,7 @@ class MyTable:
         for i in range(min(self.visibleRows, len(self.data))): 
             rowIndex = i + self.topRow
             for j in range(self.noColumns): 
-                cell = self.data[rowIndex][j] # Later we make this a more complex object
+                cell = self.data[rowIndex][j] # For more complex formatting this is a Cell dictionary
                 self.drawCell(self.cells[i][j], cell)
 
     def drawCell(self, widget, cellObject):
@@ -124,12 +131,12 @@ class MyTable:
         self.topRow = int(x)
         self.populateCells()
 
-    def _on_mousewheel(self, event): # <- Calls the table mousewheel function - scrolls the table and moves the scroll bar
+    def _on_mousewheel(self, event):
+        # <- Calls the table mousewheel function - scrolls the table and moves the scroll bar
         self.mousewheel(event.delta/120)
 
     def mousewheel(self, x): 
         if self.scroll:
-            #print (self.vertical_scroll.get())
             if x > 0:
                 y = max(self.topRow - 1,0)
             else:
@@ -140,8 +147,6 @@ class MyTable:
     # ------------------------------------------------------------------------------------
     # Click on cell
     def _click(self, event):
-        #print ('Clicked')
-        #print (event.widget)
         self.clicked(event.widget)
 
     def clicked(self, widget): # Overwrite this in parent module/class
@@ -150,6 +155,13 @@ class MyTable:
         print (widget.getText())
         print ('This function should be overwritten by the client function for handling click event')
 
+    def _cancelChange(self, event):
+        # Reset the widget value
+        print ('Escape key pressed')
+        widget = event.widget
+        widget.setText(self.data[widget.trow + self.topRow][widget.tcol]['data'])
+
+# This dictionary is a template for cell objects
 def Cell(data='', **kwargs):
     # Default values for background and foregraound colors - can be overwritten by kwargs
     return {'data': data, 'bg':'white', 'fg':'black',  **kwargs}

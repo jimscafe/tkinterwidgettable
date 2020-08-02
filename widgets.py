@@ -53,6 +53,7 @@ class Combobox(ttk.Combobox):  # , DefaultWidget):
     def getText(self):
         return self.textSelection.get()
 
+# Not used in table examples
 class Listbox(TK.Listbox):
     def __init__(self, parent, **kwargs):
         TK.Listbox.__init__(self, parent)
@@ -76,10 +77,7 @@ class Checkbox(TK.Checkbutton):
         #print ('Get Text')
         return self.var.get()    
 
-# class Table(UserTable):
-#     def __init__(self, parent, **kwargs):
-#         UserTable.__init__(self, parent)
-
+# Not used in table version
 class RadioButton(TK.Radiobutton, DefaultWidget):
     # Need a container and a TK variable to get which radio button as selected
     # The variable shared by all the radio buttons is put in the container

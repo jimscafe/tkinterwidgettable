@@ -1,7 +1,7 @@
 import tkinter as TK
 from table_v3 import MyTable, Cell
 
-# Add mousewheel scrolling
+# Cell formatting
 
 class MainGUI(object):
     def __init__(self,root):
@@ -15,12 +15,13 @@ class MainGUI(object):
         data = self.createMatrix_1(10, len(columns))
         option = 2  # Modify this to demonstrate 5 options
         # ----------------------------------------------------------------------
-        # Simple formatting - data matrix is text only
+        # Simple formatting - data matrix is text only - no formatting
         if option == 1:
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
             self.table.setData(data)
         # ----------------------------------------------------------------------
         # Option 2, use Cell dictionary when data created - overwrite default drawCell
+        # in Table class with self.drawCell() function
         if option == 2:
             data = self.createCellMatrix(10, len(columns))
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
@@ -45,6 +46,7 @@ class MainGUI(object):
         widget.configure(bg=cellObject['bg'], fg=cellObject['fg']) 
 
     def createMatrix_1(self, noRows=10, noColumns=8):
+        # Matrix of text values
         data = []
         for i in range(noRows):
             row = []
@@ -54,6 +56,7 @@ class MainGUI(object):
         return data
 
     def createCellMatrix(self, noRows, noColumns):
+        # Matrix of dictionary values (Cell() creates the dictionary)
         data = []
         for i in range(noRows):
             row = []

@@ -1,7 +1,8 @@
 import tkinter as TK
 from table_v4 import MyTable, Cell
 
-# Add mousewheel scrolling
+# Add wdigets combobox, entry, checkbox, button
+# However, the data is not changed by any interaction with the widgets
 
 class MainGUI(object):
     def __init__(self,root):
@@ -15,12 +16,17 @@ class MainGUI(object):
         data = self.createMatrix_1(10, len(columns))
         option = 2  # Modify this to demonstrate 5 options
         # ----------------------------------------------------------------------
-        # Simple formatting - data matrix is text only
+        # Put widgets in table (Entry, Combobox, Checkbox, Button)
         if option == 1:
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
             self.table.setData(data)
         # ----------------------------------------------------------------------
         # Option 2, use Cell dictionary when data created - overwrite default drawCell
+        # Need to get feedback when combobox selection is changed
+        # Currently the combo selection is bound to the click event - so for a combobox
+        # the click event is called twice, once when the widget is selected (and options
+        # drop down) and again when the selection is made - this could be made
+        # mode sophisticated 
         if option == 2:
             data = self.createCellMatrix(10, len(columns))
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
@@ -68,7 +74,6 @@ class MainGUI(object):
             data.append(row)
         for row in data:
             row[4] = {'data':'One', 'options':['One','Two','Three']}
-            print (row[4])
         return data
 
     def createColumns_1(self):

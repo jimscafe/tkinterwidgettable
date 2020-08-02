@@ -6,8 +6,8 @@ presentation of table data
 * Version 1 (_v1) - simple table with scroling
 * Version 2 (_v2) - click event, mousewheel scrolling
 * Version 3 (_v3) - Individual cell formatting via callback to parent module/class
-* Version 4 (_v4) - Use entry widget for some columns, allow cell editing in those columns
-* Version 5 (_v5) - Allow different widgets, check box, combo box, button
+* Version 4 (_v4) - Allow different widgets, check box, combo box, button
+* Version 5 (_v5) - Use entry widget for some columns, allow cell editing in those columns
 * Version 6 (_v6)  = Filter the data
 
 Currently the cells are wrapped in a frame to allow the cell dimensions to be set in pixels rather than characters.
@@ -40,3 +40,8 @@ e) How does using combobox or check box affect options a-c?
 f) Should the cell formatting be done in the table or the client logic?
 
 Trying to avoid the more complicated implementation used by some other graphic libraries.
+
+Although in Version 4, widgets can be placed in the table, the effects of using those
+widgets is not passed to the data, either in the table or external to the table. Any
+data entry or changes would have to be implemented through the click event generated
+and this would not work for the Entry widget (no click event to end the data entry)
