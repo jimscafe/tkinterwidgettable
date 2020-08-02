@@ -8,6 +8,7 @@ presentation of table data
 * Version 3 (_v3) - Individual cell formatting via callback to parent module/class
 * Version 4 (_v4) - Allow different widgets, check box, combo box, button
 * Version 5 (_v5) - Use entry widget for some columns, allow cell editing in those columns
+* Version 5a(_v5a)- Embed most of the code in the table class, not the client
 * Version 6 (_v6)  = Filter the data
 
 Currently the cells are wrapped in a frame to allow the cell dimensions to be set in pixels rather than characters.
