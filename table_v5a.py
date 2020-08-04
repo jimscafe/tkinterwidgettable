@@ -69,6 +69,8 @@ class MyTable:
                     cell = widgets.Textbox(widgetFrame)
                     cell.bind('<Return>', self._click)
                     cell.bind('<Escape>', self._cancelChange)
+                    cell.bind("<FocusOut>", self._click)
+                    #cell.bind("<Leave>", self._click) # Must decide if this is sensible behaviour
                 elif widgetName == 'Button':
                     cell = widgets.Button(widgetFrame)
                 elif widgetName == 'Checkbox':
@@ -114,7 +116,13 @@ class MyTable:
             rowIndex = i + self.topRow
             for j in range(self.noColumns): 
                 cell = self.data[rowIndex][j] # For more complex formatting this is a Cell dictionary
+                self.cells[i][j].enabled(True)  # This can be overwritten by drawCell function
                 self.drawCell(self.cells[i][j], cell)
+        if self.visibleRows > len(self.data): # Need to blank the lower rows
+            for i in range(len(self.data), self.visibleRows):
+                for j in range(self.noColumns):
+                    self.cells[i][j].setText('') # Need to disable them too 
+                    self.cells[i][j].enabled(False)
 
     def drawCell(self, widget, cellObject):
         widget.setText(cellObject) # cellObject in this simple case is a string
@@ -125,6 +133,9 @@ class MyTable:
         self.data = data
         if len(self.data) > self.visibleRows: # Should be a scroll bar
             self.vertical_scroll.configure(to=len(self.data) - self.visibleRows)
+            self.setScroll = True
+        else:
+            self.scroll = False
         self.populateCells()
 
     def setScroll(self):
@@ -132,8 +143,9 @@ class MyTable:
         self.vertical_scroll.configure(to=len(self.data) - self.visibleRows)
 
     def v_scroll(self, x):
-        self.topRow = int(x)
-        self.populateCells()
+        if self.scroll:
+            self.topRow = int(x)
+            self.populateCells()
 
     def _on_mousewheel(self, event):
         # <- Calls the table mousewheel function - scrolls the table and moves the scroll bar
@@ -154,34 +166,36 @@ class MyTable:
     def _click(self, event):
         if event.widget.trow < 0: # Column Header - handle this in parent
             self.clicked(event.widget)
-        tableRow = event.widget.trow + self.topRow
-        tableColumn = event.widget.tcol
-        if self.data[tableRow][tableColumn].get('Enabled', True): # If data element not disabled
-            if self.columns[event.widget.tcol].get('widget', '') == 'Button':
-                self.clicked(event.widget)
-            if self._isDataModified(event.widget):
-                if self.columns[tableColumn].get('widget', '') == 'Checkbox':
-                    print ('Check box clicked <- in table')
-                    value = event.widget.getText() # Value when clicked - before changed
-                    newValue = (value + 1) % 2
-                    print ('New value', newValue)
-                    # Change the table.data
-                    self.data[tableRow][tableColumn]['data'] = newValue
-                    self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': newValue})
-                elif self.columns[tableColumn].get('widget', '') == 'Combobox':
-                    print ('Combobox selection made <- table')
-                    print (event.widget.getText())
-                    print (self.data[tableRow][tableColumn]['data'])
-                    self.data[tableRow][tableColumn]['data'] = event.widget.getText()
-                    self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': event.widget.getText()})
-                elif self.columns[tableColumn].get('widget', '') == 'Textbox':
-                    print ('New entry data')
-                    self.data[tableRow][tableColumn]['data'] = event.widget.getText()
-                    self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': event.widget.getText()})
+        else:
+            if event.widget.cget('state') == 'normal':
+                tableRow = event.widget.trow + self.topRow
+                tableColumn = event.widget.tcol
+                if self.data[tableRow][tableColumn].get('Enabled', True): # If data element not disabled
+                    if self.columns[event.widget.tcol].get('widget', '') == 'Button':
+                        self.clicked(event.widget)
+                    if self._isDataModified(event.widget):
+                        if self.columns[tableColumn].get('widget', '') == 'Checkbox':
+                            print ('Check box clicked <- in table')
+                            value = event.widget.getText() # Value when clicked - before changed
+                            newValue = (value + 1) % 2
+                            print ('New value', newValue)
+                            # Change the table.data
+                            self.data[tableRow][tableColumn]['data'] = newValue
+                            self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': newValue})
+                        elif self.columns[tableColumn].get('widget', '') == 'Combobox':
+                            print ('Combobox selection made <- table')
+                            print (event.widget.getText())
+                            print (self.data[tableRow][tableColumn]['data'])
+                            self.data[tableRow][tableColumn]['data'] = event.widget.getText()
+                            self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': event.widget.getText()})
+                        elif self.columns[tableColumn].get('widget', '') == 'Textbox':
+                            print ('New entry data')
+                            self.data[tableRow][tableColumn]['data'] = event.widget.getText()
+                            self.dataUpdated({'row': tableRow, 'column':tableColumn, 'newvalue': event.widget.getText()})
 
-                print ('Data Modified')
-                self.dataChanged = True
-            self.clicked(event.widget) # Parent callback if implemented
+                        print ('Data Modified')
+                        self.dataChanged = True
+                    self.clicked(event.widget) # Parent callback if implemented
 
     def clicked(self, widget): # Overwrite this in parent module/class
         print ('Cell clicked (if row is -1, the column header was clicked')

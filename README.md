@@ -9,7 +9,7 @@ presentation of table data
 * Version 4 (_v4) - Allow different widgets, check box, combo box, button
 * Version 5 (_v5) - Use entry widget for some columns, allow cell editing in those columns
 * Version 5a(_v5a)- Embed most of the code in the table class, not the client
-* Version 6 (_v6)  = Filter the data
+* Version 6 (_v6) - Filter the data
 
 Currently the cells are wrapped in a frame to allow the cell dimensions to be set in pixels rather than characters.
 The widgets are inherited into classes (widgets.py) to allow similar command to get and update their content (e.g. widget.setText('123')  widget.getText())
@@ -21,7 +21,7 @@ example negative numbers with a red background, text alignment in different colu
 
 Cell Formatting
 
-a)It is possible to decouple the data from the table completely and have a callback prosess each widget
+a)It is possible to decouple the data from the table completely and have a callback process each widget
 as the cell is populated. The client would keep all the necessary data and formatting parameters.
 The scrolling parameters would require setting rather than use len(self.data) - which is currently
 the way it is done. If filtering is done, there would need to be an original matrix of data 
@@ -46,3 +46,14 @@ Although in Version 4, widgets can be placed in the table, the effects of using 
 widgets is not passed to the data, either in the table or external to the table. Any
 data entry or changes would have to be implemented through the click event generated
 and this would not work for the Entry widget (no click event to end the data entry)
+
+Currently (3 Aug 2020) the colors of the widgets is set in the data. This allows individual
+cells to have a color scheme depending upon the value in the cell.
+
+If this feature is not needed, it should be possible to set the colors on all the widgets
+before data is applied (usually an entire column). For the ttk.Comobox this might be the only
+possibility (by creating a global style for the combobox)
+If can be used for coloring rows in stripes, but if this is set once obly (before data is applied)
+the striping will not scroll. If the striping is required to scroll with the data then the row
+coloring needs to be set in the cell drawCell function.
+

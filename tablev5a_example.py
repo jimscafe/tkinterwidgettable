@@ -23,7 +23,7 @@ class MainGUI(object):
         # How to define columns (text, width, colors)?
         columns = self.createColumns_1()
         noRows = 8
-        option = 1  # Modify this to demonstrate options
+        option = 2  # Modify this to demonstrate options
         # ----------------------------------------------------------------------
         # Improve code encapsulation
         if option == 1:
@@ -34,6 +34,15 @@ class MainGUI(object):
             self.table.clicked = self.clicked
             self.table.dataUpdated = self.dataChanged
             self.table.setData(data)
+        # ----------------------------------------------------------------------
+        # What if the data shrinks i.e. filtered on some value?
+        if option == 2:
+            data = self.createCellMatrix(noRows=12, noColumns=len(columns))
+            self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
+            self.table.drawCell = self.drawCell
+            self.table.setData(data)  # This is not visible, overwritten by next two lines of code
+            newData = data[:6]
+            self.table.setData(newData)
 
         # Get table dimensions if needed
         print (f'Table size w:{self.table.width} h:{self.table.height}')
@@ -55,19 +64,12 @@ class MainGUI(object):
 
     def drawCell(self, widget, cellObject):
         # There are many different ways this effect can be implemented
+        # The data could have a key 'enabled' - to disable the widget
         data = cellObject['data']
         widget.setText(data)
-        # Background and foregraound could be set when data matrix created
-        if data == '2:1': # Format cell with specific data value
-            cellObject['bg'] = 'green'
-            cellObject['fg'] = 'white'
-        if widget.tcol == 3: # Format column
-            cellObject['bg'] = 'pink'
-        # Does this apply to all possible widgets - can depend upon column?
         try: # Not applicable to Combobox
             widget.configure(bg=cellObject['bg'], fg=cellObject['fg']) 
         except: # Assume Combobox
-            #print (data)
             widget.setOptions(cellObject['options'])
             widget.textSelection.set(data)
 

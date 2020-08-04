@@ -52,6 +52,10 @@ class Combobox(ttk.Combobox):  # , DefaultWidget):
         self.textSelection.set(txt)
     def getText(self):
         return self.textSelection.get()
+    def enabled(self, b):
+        s = 'disabled'
+        if b: s = 'normal'
+        self.config(state=s)
 
 # Not used in table examples
 class Listbox(TK.Listbox):
@@ -76,7 +80,11 @@ class Checkbox(TK.Checkbutton):
     def getText(self):
         #print ('Get Text')
         return self.var.get()    
-
+    def enabled(self, b):
+        s = 'disabled'
+        if b: s = 'normal'
+        self.config(state=s)
+        
 # Not used in table version
 class RadioButton(TK.Radiobutton, DefaultWidget):
     # Need a container and a TK variable to get which radio button as selected

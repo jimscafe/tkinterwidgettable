@@ -11,7 +11,7 @@ class MainGUI(object):
         columns = self.createColumns_1()
         noRows = 10
         data = self.createMatrix_1(10, len(columns))
-        option = 1  # Modify this to demonstrate 5 options
+        option = 5  # Modify this to demonstrate 5 options
         # ----------------------------------------------------------------------
         # Option to draw table before data created?
         if option == 1:
