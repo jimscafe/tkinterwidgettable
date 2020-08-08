@@ -1,17 +1,13 @@
 """
-  Implementation example of data editing for each of the wdigets Entry, Checkbox, Combobox, Button
-  Button -> click event
-  Clickbox -> Change data, cell updated
+  Modify code - better API, better data design  
+
+  If modified data is saved in parent, then changed flag reset?
+
+  Handle the scroll bar better.
 """
 import tkinter as TK
 from tkinter import messagebox
-from table_v5a import MyTable, Cell
-
-# Add wdigets combobox, entry, checkbox, button
-# Handle the data changes
-# Check box original data - should be changed to 0 or 1 in table.data
-# Can modify this if necessary
-# Need option for combo to be initially empty
+from table_v6 import MyTable, Cell
 
 class MainGUI(object):
     def __init__(self,root):
@@ -23,7 +19,7 @@ class MainGUI(object):
         # How to define columns (text, width, colors)?
         columns = self.createColumns_1()
         noRows = 8
-        option = 1  # Modify this to demonstrate options
+        option = 3 # Modify this to demonstrate options
         # ----------------------------------------------------------------------
         # Improve code encapsulation
         if option == 1:
@@ -33,42 +29,50 @@ class MainGUI(object):
             data = self.createCellMatrix(noRows=12, noColumns=len(columns))
             self.table.setData(data)
         # ----------------------------------------------------------------------
-        # What if the data shrinks i.e. filtered on some value?
+        # No scroll bar initially, then data requires scroll bar
         if option == 2:
+            self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=False)
             data = self.createCellMatrix(noRows=12, noColumns=len(columns))
+            self.table.setData(data)
+        # ----------------------------------------------------------------------
+        # Data requires scroll bar initially, then data reduced and scroll not needed
+        if option == 3:
             self.table = MyTable(self.tableFrame, columns, rows=noRows, scroll=True)
-            self.table.drawCell = self.drawCell
-            self.table.setData(data)  # This is not visible, overwritten by next two lines of code
-            newData = data[:6]
-            self.table.setData(newData)
+            data = self.createCellMatrix(noRows=12, noColumns=len(columns))
+            self.table.setData(data)
+            #self.table.setData(data[:6])
 
         # Get table dimensions if needed
         print (f'Table size w:{self.table.width} h:{self.table.height}')
 
     def dataChanged(self, changes):
+        # Need the coordinates of the original data - to update if required
+        # Perhaps each row has an ID?
         print ('Data changed')
         print (changes)
 
     def clicked(self, widget):
-        print (f'Parent:Clicked : row={widget.trow} : column={widget.tcol}')
-        row= widget.trow
-        column= widget.tcol
+        print (f'Parent:Clicked : row={widget.tableRow} : column={widget.tableColumn}')
+        print (f'Datat Coordinates ({widget.dataCoords[0]},{widget.dataCoords[1]})')
+        row= widget.tableRow
+        column= widget.tableColumn
         if self.table.columns[column].get('widget', '') == 'Button':
             self.buttonAction(widget)
 
     def buttonAction(self, widget):
         print ('Activate required button action')
-        print ('Data Row:', widget.trow + self.table.topRow, 'Data Column:', widget.tcol)
 
-    def drawCell(self, widget, cellObject):
+        print ('Data Row:', widget.tableRow + self.table.topRow, 'Data Column:', widget.tableColumn)
+
+    def drawCell(self, widget, cellDict):
         # There are many different ways this effect can be implemented
         # The data could have a key 'enabled' - to disable the widget
-        data = cellObject['data']
+        data = cellDict['data']
         widget.setText(data)
         try: # Not applicable to Combobox
-            widget.configure(bg=cellObject['bg'], fg=cellObject['fg']) 
+            widget.configure(bg=cellDict['bg'], fg=cellDict['fg']) 
         except: # Assume Combobox
-            widget.setOptions(cellObject['options'])
+            widget.setOptions(cellDict['options'])
             widget.textSelection.set(data)
 
     def createCellMatrix(self, noRows, noColumns):

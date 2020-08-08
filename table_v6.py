@@ -10,7 +10,10 @@
 """
 
 import tkinter as TK
-import widgets
+try:
+    import widgets
+except:
+    from Libs import widgets
 
 DEFAULTCELLWIDTH = 50
 DEFAULTCELLHEIGHT = 25
@@ -43,7 +46,7 @@ class MyTable:
         self.columns = columns
         self.width = 0 # Pixels
         self.height = 0
-        self.cells = []  # Two dimension array
+        self.widgets = []  # Two dimension array
         self.drawWidgets()
         if self.data:
             self.setData(data)
@@ -59,8 +62,8 @@ class MyTable:
             cell.configure(bg=self.columns[j]['bg'], fg=self.columns[j]['fg'])
             cell.pack(expand=TK.YES, fill=TK.BOTH)
             cell.setText(self.columns[j]['text'])
-            cell.trow = -1
-            cell.tcol = j
+            cell.tableRow = -1
+            cell.tableColumn = j
             cell.bind("<Button-1>", self._click) 
             pad = (1,1)
             if j == 0: pad = (2,1)
@@ -69,43 +72,44 @@ class MyTable:
 
         # Second create cell widgets
         for i in range(self.visibleRows):
-            cell_row = []
+            widgetRow = []
             for j in range(self.noColumns):
                 widgetName = self.columns[j].get('widget', 'Label') # Default to label
                 widgetFrame = TK.Frame(self.parent,width=self.columns[j]['width'],
                                        height=DEFAULTCELLHEIGHT) #,
                 widgetFrame.pack_propagate(0) # Stops child widgets of label_frame from resizing it
                 if widgetName == 'Textbox':
-                    cell = widgets.Textbox(widgetFrame)
-                    cell.bind('<Return>', self._click)
-                    cell.bind('<Escape>', self._cancelChange)
-                    cell.bind("<FocusOut>", self._click)
-                    #cell.bind("<Leave>", self._click) # Must decide if this is sensible behaviour
+                    cellWidget = widgets.Textbox(widgetFrame)
+                    cellWidget.bind('<Return>', self._click)
+                    cellWidget.bind('<Escape>', self._cancelChange)
+                    cellWidget.bind("<FocusOut>", self._click)
+                    #cellWidget.bind("<Leave>", self._click) # Must decide if this is sensible behaviour
                 elif widgetName == 'Button':
-                    cell = widgets.Button(widgetFrame)
+                    cellWidget = widgets.Button(widgetFrame)
                 elif widgetName == 'Checkbox':
-                    cell = widgets.Checkbox(widgetFrame)
+                    cellWidget = widgets.Checkbox(widgetFrame)
                 elif widgetName == 'Combobox':
-                    cell = widgets.Combobox(widgetFrame)
-                    cell.bind("<<ComboboxSelected>>", self._click)
+                    cellWidget = widgets.Combobox(widgetFrame)
+                    cellWidget.bind("<<ComboboxSelected>>", self._click)
                 else:
-                    cell = widgets.Label(widgetFrame)
-                cell.pack(expand=TK.YES, fill=TK.BOTH)
+                    cellWidget = widgets.Label(widgetFrame)
+                cellWidget.pack(expand=TK.YES, fill=TK.BOTH)
                 align = self.columns[j].get('align', '')
                 if align:
-                    cell.configure(anchor=ANCHOR[align])
-                cell.setText('')
-                cell.trow = i
-                cell.tcol = j
-                cell.bind("<Button-1>", self._click) 
-                cell_row.append(cell)
+                    cellWidget.configure(anchor=ANCHOR[align])
+                cellWidget.setText('')
+                cellWidget.tableRow = i
+                cellWidget.tableColumn = j
+                cellWidget.dataCoords = []  # The row/column in the data matrix - set when table populated
+                cellWidget.bind("<Button-1>", self._click) 
+                widgetRow.append(cellWidget)
                 pad = (1,1)
                 ypad = (1,1)
                 if j == 0: pad = (2,1)
                 if j == self.noColumns -1: pad=(1,2)
                 if i == self.visibleRows -1: ypad = (1,2)
                 widgetFrame.grid(row=i+1, column=j, padx=pad, pady=ypad)
-            self.cells.append(cell_row)
+            self.widgets.append(widgetRow)
         if self.data:    
             if len(self.data) > self.visibleRows:
                 self.scroll = True  
@@ -128,16 +132,18 @@ class MyTable:
         for i in range(min(self.visibleRows, len(self.data))): 
             rowIndex = i + self.topRow
             for j in range(self.noColumns): 
-                cell = self.data[rowIndex][j] # For more complex formatting this is a Cell dictionary
-                self.cells[i][j].enabled(True)  # This can be overwritten by drawCell function
-                self.drawCell(self.cells[i][j], cell)
+                cellObject = self.data[rowIndex][j] # For more complex formatting this is a Cell dictionary
+                self.widgets[i][j].enabled(True)  # This can be overwritten by drawCell function
+                self.widgets[i][j].dataCoords = (rowIndex, j)
+                self.drawCell(self.widgets[i][j], cellObject)
         if self.visibleRows > len(self.data): # Need to blank the lower rows
             for i in range(len(self.data), self.visibleRows):
                 for j in range(self.noColumns):
-                    self.cells[i][j].setText('') # Need to disable them too 
-                    self.cells[i][j].enabled(False)
+                    self.widgets[i][j].setText('') # Need to disable them too 
+                    self.widgets[i][j].enabled(False)
 
     def drawCell(self, widget, cellObject):
+        # Widget has attribute dataCoords -> (row,column) of the data matrix
         widget.setText(cellObject) # cellObject in this simple case is a string
 
     def setData(self, data):
@@ -145,10 +151,20 @@ class MyTable:
         self.dataChanged = False
         self.data = data
         if len(self.data) > self.visibleRows: # Should be a scroll bar
+            if not self.scroll:
+                col = len(self.columns)
+                x = len(self.data) - self.visibleRows
+                self.vertical_scroll = TK.Scale(self.parent, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
+                self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
+
             self.vertical_scroll.configure(to=len(self.data) - self.visibleRows)
             self.setScroll = True
         else:
             self.scroll = False
+            try:
+                self.vertical_scroll.destroy()
+            except:
+                pass # No scrollbar to destroy
         self.populateCells()
 
     def setScroll(self):
@@ -177,14 +193,14 @@ class MyTable:
     # Click on cell - can be just a click, or can be a cell data change
     # ------------------------------------------------------------------------------------
     def _click(self, event):
-        if event.widget.trow < 0: # Column Header - handle this in parent
+        if event.widget.tableRow < 0: # Column Header - handle this in parent
             self.clicked(event.widget)
         else:
             if event.widget.cget('state') == 'normal':
-                tableRow = event.widget.trow + self.topRow
-                tableColumn = event.widget.tcol
+                tableRow = event.widget.tableRow + self.topRow
+                tableColumn = event.widget.tableColumn
                 if self.data[tableRow][tableColumn].get('Enabled', True): # If data element not disabled
-                    if self.columns[event.widget.tcol].get('widget', '') == 'Button':
+                    if self.columns[event.widget.tableColumn].get('widget', '') == 'Button':
                         self.clicked(event.widget)
                     if self._isDataModified(event.widget):
                         if self.columns[tableColumn].get('widget', '') == 'Checkbox':
@@ -212,7 +228,7 @@ class MyTable:
 
     def clicked(self, widget): # Overwrite this in parent module/class
         print ('Cell clicked (if row is -1, the column header was clicked')
-        print (f'row={widget.trow} : column={widget.tcol}')
+        print (f'row={widget.tableRow} : column={widget.tableColumn}')
         print (widget.getText())
         print ('This function should be overwritten by the client function for handling click event')
 
@@ -222,11 +238,11 @@ class MyTable:
     def _isDataModified(self, widget):
         # Check if checkbox or button - then data has changed
         # Else check if the data has changed
-        if self.columns[widget.tcol].get('widget', '') == 'Checkbox':
+        if self.columns[widget.tableColumn].get('widget', '') == 'Checkbox':
             return True
-        if self.columns[widget.tcol].get('widget', '') == 'Button':
+        if self.columns[widget.tableColumn].get('widget', '') == 'Button':
             return True
-        return widget.getText() != self.data[widget.trow + self.topRow][widget.tcol]['data']
+        return widget.getText() != self.data[widget.tableRow + self.topRow][widget.tableColumn]['data']
 
     # def _updateCell(self, widget):
     #     pass
@@ -239,7 +255,7 @@ class MyTable:
         # Reset the widget value
         print ('Escape key pressed')
         widget = event.widget
-        widget.setText(self.data[widget.trow + self.topRow][widget.tcol]['data'])
+        widget.setText(self.data[widget.tableRow + self.topRow][widget.tableColumn]['data'])
 
 # This dictionary is a template for cell objects
 def Cell(data='', **kwargs):

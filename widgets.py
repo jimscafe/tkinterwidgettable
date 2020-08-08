@@ -57,15 +57,6 @@ class Combobox(ttk.Combobox):  # , DefaultWidget):
         if b: s = 'normal'
         self.config(state=s)
 
-# Not used in table examples
-class Listbox(TK.Listbox):
-    def __init__(self, parent, **kwargs):
-        TK.Listbox.__init__(self, parent)
-    def add(self, txt):
-        self.insert(TK.END, txt)
-    def getRows(self): # Overwrites existing get
-        return self.get(0, TK.END)
-
 class Checkbox(TK.Checkbutton):
     def __init__(self, parent, **kwargs):
         TK.Checkbutton.__init__(self, parent)
@@ -91,3 +82,12 @@ class RadioButton(TK.Radiobutton, DefaultWidget):
     # The variable shared by all the radio buttons is put in the container
     def __init__(self, parent, **kwargs):
         TK.Radiobutton.__init__(self, parent)
+
+# Not used in table examples
+class Listbox(TK.Listbox):
+    def __init__(self, parent, **kwargs):
+        TK.Listbox.__init__(self, parent)
+    def add(self, txt):
+        self.insert(TK.END, txt)
+    def getRows(self): # Overwrites existing get
+        return self.get(0, TK.END)
