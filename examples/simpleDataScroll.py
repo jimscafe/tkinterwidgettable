@@ -19,15 +19,9 @@ class Main():
         self.tableTitle = TK.Label(self.tableFrame, text='Simple Table')
         self.tableTitle.pack()
 
-
-        columns = [Column('One', align='left'),Column('Two'), Column('Three'),Column('Four')]
+        columns = [Column('One'),Column('Two'), Column('Three'),Column('Four')]
         self.table = MyTable(self.tableFrame, columns, rows=10)
-        self.table.setData(sampleData.data1) 
-
-        """
-           or
-           self.table = MyTable(self.tableFrame, columns, data=sample.data1) Rows calculated automatically
-        """
+        self.table.setData(sampleData.data2) 
 
     
         self.buttonFrame = TK.Frame(self.frame)
