@@ -1,59 +1,30 @@
 # tkinterwidgettable
-Tkinter table with each cell a widget, vertical scrolling only
-Version 1 shows the basic principle and can be used for simple
-presentation of table data
 
-* Version 1 (_v1) - simple table with scroling
-* Version 2 (_v2) - click event, mousewheel scrolling
-* Version 3 (_v3) - Individual cell formatting via callback to parent module/class
-* Version 4 (_v4) - Allow different widgets, check box, combo box, button
-* Version 5 (_v5) - Use entry widget for some columns, allow cell editing in those columns
-* Version 5a(_v5a)- Embed most of the code in the table class, not the client
-* Version 6 (_v6) - Filter the data
+The initial design included a dictionary for every data item - in this way individual items
+can be processed separate from the others in the same column or row.
 
-Currently the cells are wrapped in a frame to allow the cell dimensions to be set in pixels rather than characters.
-The widgets are inherited into classes (widgets.py) to allow similar command to get and update their content (e.g. widget.setText('123')  widget.getText())
-There is padding around the cells to allow the background color from the parent frame to give grid
-lines around the cells. This can be easily modified as required. Later might set the as possible parameters
-Horizontal scrolling is not implemented due to using widgets. Not sure if this will be added later.
-Cell formatting can be set in a callback function to allow complete formatting of the cell. For
-example negative numbers with a red background, text alignment in different columns etc.
+The current version does not do this and any individual processing or formatting can be
+applied when the parent application processes the drawing of each table cell using a 
+callback.
 
-Cell Formatting
+The SampleDataEditCell.py illustrates all the table features.
 
-a)It is possible to decouple the data from the table completely and have a callback process each widget
-as the cell is populated. The client would keep all the necessary data and formatting parameters.
-The scrolling parameters would require setting rather than use len(self.data) - which is currently
-the way it is done. If filtering is done, there would need to be an original matrix of data 
-and a currently displayed matrix.
+Simpler examples can be seen in the examples directory.
 
-b)Alternatively the table.data matrix could contain only text while a 'mirror' matrix in the parent client or even in the table object could contain all the logic to populate and format the cell. If
-the logic matrix is not supplied, one could be automatically created
+There are options to provide a callback function for each mouse click, for changed data
+and for drawing each table cell. 
 
-c)Finally the data matrix stored in the table could be a complex object containing all the necessary
-information for populating and formatting each cell. (e.g. Cell class/object)
+Columns in the table can be Labels (default), Entry widget (Textbox), Button, Combobox
+and Checkbox.
 
-d)How do any of these fit with the data being in a database and not all available at the time the 
-table is drawn (very large data)
+The column header can be clicked which allows for the parent application to carry out
+sorting of data etc.
 
-e) How does using combobox or check box affect options a-c?
+The table is intended to be a quick way of displaying tabular data (no callbacks required)
+or a more complex data processing requirements.
 
-f) Should the cell formatting be done in the table or the client logic?
+Still to do is filtering.
 
-Trying to avoid the more complicated implementation used by some other graphic libraries.
-
-Although in Version 4, widgets can be placed in the table, the effects of using those
-widgets is not passed to the data, either in the table or external to the table. Any
-data entry or changes would have to be implemented through the click event generated
-and this would not work for the Entry widget (no click event to end the data entry)
-
-Currently (3 Aug 2020) the colors of the widgets is set in the data. This allows individual
-cells to have a color scheme depending upon the value in the cell.
-
-If this feature is not needed, it should be possible to set the colors on all the widgets
-before data is applied (usually an entire column). For the ttk.Comobox this might be the only
-possibility (by creating a global style for the combobox)
-If can be used for coloring rows in stripes, but if this is set once obly (before data is applied)
-the striping will not scroll. If the striping is required to scroll with the data then the row
-coloring needs to be set in the cell drawCell function.
+The table should be quite felixible and able to handle large data - perhaps in a
+database.
 
