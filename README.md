@@ -28,3 +28,8 @@ Still to do is filtering.
 The table should be quite felixible and able to handle large data - perhaps in a
 database.
 
+For examples see the examples folder and look at all the py files beginning with the text Simple (simple)
+
+
+Perhaps the widgets.py file code should be placed in the table.py file to avoid the table
+requiring any imports
