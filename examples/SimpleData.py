@@ -36,8 +36,6 @@ class Main():
         self.quitButton = TK.Button(self.buttonFrame, text='Quit', command=self.quit)
         self.quitButton.pack(pady=10, padx=20, anchor='e')
 
-
-
     def quit(self):
         self.parent.destroy()
 

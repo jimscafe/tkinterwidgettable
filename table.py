@@ -124,13 +124,15 @@ class MyTable:
                 self.scroll = True  
                 col = len(self.columns)
                 x = len(self.data) - self.visibleRows
-                self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-                self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
+                self.addVerticalScroll(x)
+                #self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
+                #self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
         elif self.scroll:
             col = len(self.columns)
             x = 0
-            self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-            self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
+            self.addVerticalScroll(x)
+            #self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
+            #self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
 
         # Get parent frame width and height - x and y coordinates can also be accessed
         self.tableFrame.update() # Required to get frame width and height at this time
@@ -161,11 +163,15 @@ class MyTable:
         self.data = data
         if len(self.data) > self.visibleRows: # Should be a scroll bar
             if not self.scroll:
-                col = len(self.columns)
-                x = len(self.data) - self.visibleRows
-                self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-                self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
-
+                self.addVerticalScroll(len(self.data) - self.visibleRows)
+                # col = len(self.columns)
+                # x = len(self.data) - self.visibleRows
+                # self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
+                # self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
+                # print ('Setting vertical scroll')
+                # # Try to add frame to remove black rectangle top right
+                # self.topRight = TK.Frame(self.tableFrame)
+                # self.topRight.grid(row=0,column=col, sticky=TK.NSEW)
             self.vertical_scroll.configure(to=len(self.data) - self.visibleRows)
             self.scroll = True
         else:
@@ -175,6 +181,15 @@ class MyTable:
             except:
                 pass # No scrollbar to destroy
         self.populateCells()
+
+    def addVerticalScroll(self, x):
+        col = len(self.columns)
+        #x = len(self.data) - self.visibleRows
+        self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
+        self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
+        # Try to add frame to remove black rectangle top right
+        self.topRight = TK.Frame(self.tableFrame)
+        self.topRight.grid(row=0,column=col, sticky=TK.NSEW)
 
     def setScroll(self):
         # Reset the scroll bar
