@@ -2,15 +2,15 @@
    Allow editing of data and provide feedback of any changes to the parent widget (Frame)
    <Enter> key and 'lost focus; used to determine when data is entered in the Enter Widget
    <ESC> key used to cancel data changes
-   The changes are then reflected in the table.data matrix and also a signal sent to the client
-   class
+   The changes are NOT reflected in the table.data matrix 
    Currently to enter data with the Entry widget, that data is saved only when the return
-   key is pressed. If no return key is pressed the table.data is not updated.
+   key is pressed or Tab key.  The ESC key will cancel the change.
+   
    Added column alignment of text (anchor) 
 
    Decided to handle button click with <ButtonReleased> event and cancel the click event
-   for buttons
-   But this can easily be reveresed and button clicks handle in the click callback
+   for Button widgets
+   But this can easily be reversed and button clicks handle in the click callback
    in the parent
 """
 
