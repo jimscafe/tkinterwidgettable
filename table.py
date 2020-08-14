@@ -12,6 +12,9 @@
    for Button widgets
    But this can easily be reversed and button clicks handle in the click callback
    in the parent
+
+   Added Frame to top right when there is a scroll bar - to cover the black rectangle
+   the gap in widgets exposes
 """
 
 import tkinter as TK
@@ -125,14 +128,10 @@ class MyTable:
                 col = len(self.columns)
                 x = len(self.data) - self.visibleRows
                 self.addVerticalScroll(x)
-                #self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-                #self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
         elif self.scroll:
             col = len(self.columns)
             x = 0
             self.addVerticalScroll(x)
-            #self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-            #self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
 
         # Get parent frame width and height - x and y coordinates can also be accessed
         self.tableFrame.update() # Required to get frame width and height at this time
@@ -164,14 +163,6 @@ class MyTable:
         if len(self.data) > self.visibleRows: # Should be a scroll bar
             if not self.scroll:
                 self.addVerticalScroll(len(self.data) - self.visibleRows)
-                # col = len(self.columns)
-                # x = len(self.data) - self.visibleRows
-                # self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
-                # self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
-                # print ('Setting vertical scroll')
-                # # Try to add frame to remove black rectangle top right
-                # self.topRight = TK.Frame(self.tableFrame)
-                # self.topRight.grid(row=0,column=col, sticky=TK.NSEW)
             self.vertical_scroll.configure(to=len(self.data) - self.visibleRows)
             self.scroll = True
         else:
@@ -187,7 +178,7 @@ class MyTable:
         #x = len(self.data) - self.visibleRows
         self.vertical_scroll = TK.Scale(self.tableFrame, orient=TK.VERTICAL, from_=0, to=x, command=self.v_scroll, showvalue=0)
         self.vertical_scroll.grid(row=1,column=col, rowspan=self.visibleRows, sticky=TK.N+TK.S)
-        # Try to add frame to remove black rectangle top right
+        # Add frame to remove black rectangle top right - above scroll bar
         self.topRight = TK.Frame(self.tableFrame)
         self.topRight.grid(row=0,column=col, sticky=TK.NSEW)
 
