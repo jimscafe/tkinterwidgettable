@@ -1,6 +1,6 @@
 import tkinter as TK
 
-from table import MyTable, Column
+from table_noframes import MyTable, Column
 import sampleData
 
 class Main():
@@ -20,7 +20,7 @@ class Main():
         self.tableTitle.pack()
 
 
-        columns = [Column('One', align='left'),Column('Two'), Column('Three'),Column('Four')]
+        columns = [Column('One', width=5, align='left'),Column('Two', width=20), Column('Three'),Column('Four',widget='Textbox')]
         self.table = MyTable(self.tableFrame, columns, rows=10)
         self.table.setData(sampleData.data1) 
 
