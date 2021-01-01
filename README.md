@@ -1,5 +1,12 @@
 # tkinterwidgettable
 Jan 1 2021
+These files are quite old in dvelopment terms.
+See latest version with sample code in folder latestUsage
+
+The latest version copes well with sparse matrix data.
+
+In use the widgets.py functions have been added to the end of the table.py or table_nf.py ( shortening of table_noframes.py name) file to avoid requiing wo files to be imported when using the table. The widgets are created so that standard functions can be used to set and access the widget data for example getText()
+
 The table without frames has been developed and used, though I am not convinced that omitting frames has changed the display speed significantly. Using frames allows a more precise setting of cell dimensions using pixels.
 
 I have not, as yet, kept this project up-to-date on github, if there is interest in using the table then I will do so. I do use the table a lot in my applications, it is easy to implement for simple jobs and can handle quite complex requirements.
